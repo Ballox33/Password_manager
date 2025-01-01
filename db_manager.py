@@ -39,4 +39,22 @@ def get_passwords():
     conn.close()
     return rows
 
+def search_passwords(sito_search, password_search, user_search):
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base_dir, "password_manager_db.sqlite")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"""SELECT * FROM passwords WHERE id_sito LIKE '%{sito_search}%' AND password LIKE '%{password_search}%' 
+                    AND user LIKE '%{user_search}%';""")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def delete_password():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base_dir, "password_manager_db.sqlite")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    print("Digitare la ")
+    cursor.execute()
 #Da aggiungere la funzione per recuperare una psw alla volta per sito o utente
