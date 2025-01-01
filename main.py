@@ -1,10 +1,11 @@
-from db_manager import initialize_db, add_password, get_passwords #potrei anche importare tutto con *
+from db_manager import initialize_db, add_password, get_passwords, search_passwords #potrei anche importare tutto con *
 
 def show_menu():
     print("\nMenu:")
     print("1. Aggiungi una nuova password")
     print("2. Visualizza tutte le password")
-    print("3. Esci")
+    print("3. Cerca una password")
+    print("4. Esci")
 
 def add_new_password():
     id_sito = input("Sito: ")               #input permette di inserire il valore
@@ -20,7 +21,24 @@ def display_passwords():
         print("Nessuna password trovata.")
         return
     for pwd in passwords:
-        print(f"Sito: {pwd[0]}, Username: {pwd[1]}, Password: {pwd[2]}, Descrizione: {pwd[3]}")
+        print(f"Sito: {pwd[0]} | Username: {pwd[1]} | Password: {pwd[2]} | Descrizione: {pwd[3]}")
+
+def search_passwords_main():
+    print("Benvenuto nella sezione di ricerca della tua password!\n")
+    print("Per effettuare la ricerca delle tue password digita il nome o parte di esso di ciò che vuoi cercare per ogni campo richiesto!\n")
+    print("Ricorda che se vuoi puoi lasciare un campo vuoto!\n")
+    sito_search = input("Di che sito è la password che stai cercando: \n")
+    password_search = input("Che password stai cercando: \n")
+    user_search = input("Chi è l'utente al quale appartiene la password: \n")
+    passwords = search_passwords(sito_search, password_search, user_search)
+    if not passwords:
+        print("Nessuna password trovata.")
+        return
+    else:
+        print("Ecco le password trovate:\n")
+        for pwd in passwords:
+            print(f"Sito: {pwd[0]} | Username: {pwd[1]} | Password: {pwd[2]} | Descrizione: {pwd[3]}")
+
 
 def main():
     print("Benvenuto nel Password Manager!")
@@ -29,7 +47,8 @@ def main():
     actions = {                               #è un type dictionary (ad ogni parola corrisponde una chiave)
         "1": add_new_password,
         "2": display_passwords,
-        "3": exit_program
+        "3": search_passwords_main,
+        "4": exit_program
     }
 
     while True:                                        #while true serve a tenere il ciclo del menu attivo finchè non si esce
