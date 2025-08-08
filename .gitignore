@@ -1,0 +1,31 @@
+# Bytecode files
+__pycache__/
+*.py[cod]
+
+# Editor/IDE config files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# SQLite database file
+*.sqlite
+*.sqlite3
+*.db
+
+# Environment / dependencies
+.env
+.venv/
+venv/
+env/
+Pipfile.lock
+poetry.lock
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# macOS/Linux system files
+.DS_Store
+Thumbs.db
