@@ -1,6 +1,6 @@
 # Password_manager
 Tool for the storage and management of passwords. To run it you will need SQlite.
 
-It is just an exercise to get used with coding
+To install sqlite3 run "sudo apt install sqlite3"
 
-I'm open to suggestion or comments :)
+To launch do "python3 /main-py"
