@@ -2,9 +2,13 @@ import sqlite3
 import os
 
 def get_db_path():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base_dir, "password_manager_db.sqlite")
-
+    try:
+        # Check if the environment variable is set
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base_dir, "password_manager_db.sqlite")
+    except Exception as e:
+        print(f"Error getting database path: {e}")
+        return None
 
 def initialize_db():                                 #funzione per attivare il db
     conn = sqlite3.connect(get_db_path())      #definisco una variabile che stabilisce la connessione col db
