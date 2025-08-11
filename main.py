@@ -1,4 +1,7 @@
-from db_manager import initialize_db, add_password, get_passwords, search_passwords,delete_password,update_password#potrei anche importare tutto con *
+from db_manager import initialize_db,add_password, get_passwords, search_passwords \
+,delete_password,update_password
+from crypto_manager import encrypt_password, decrypt_password, check_master_password #potrei anche importare tutto con *
+from utils import id_sito_input, id_sito_input_search
 
 def show_menu():
     print("\nMenu:")
@@ -8,42 +11,44 @@ def show_menu():
     print("4. Cerca e rimuovi/aggiorna una password")
     print("5. Esci")
 
-def add_new_password():
-    id_sito = input("Sito: ")               #input permette di inserire il valore
+def add_new_password(master):
+    id_sito = id_sito_input()  # Uso una funzione per fare il check sul master
     password = input("Password: ")
     user = input("User: ")
     Description = input("Descrizione (opzionale): ")
-    add_password(id_sito, password, user, Description)
+    add_password(id_sito,encrypt_password(master, password), user, Description)
     print("Password aggiunta con successo!")
 
-def display_passwords():
+def display_passwords(master):
     passwords = get_passwords()
     if not passwords:
         print("Nessuna password trovata.")
         return
     for pwd in passwords:
-        print(f"Sito: {pwd[0]} | Password: {pwd[1]} | User: {pwd[2]} | Descrizione: {pwd[3]}")
+        decrypted_password = decrypt_password(master, pwd[1])  # Decrypt the password
+        print(f"Sito: {pwd[0]} | Password: {decrypted_password} | User: {pwd[2]} | Descrizione: {pwd[3]}")
 
-def search_passwords_main():
+def search_passwords_main(master):
     print("Per effettuare la ricerca delle tue password digita il nome o parte di esso di ciò che vuoi cercare per ogni campo richiesto!\n")
     print("Ricorda che se vuoi puoi lasciare un campo vuoto!\n")
-    sito_search = input("Di che sito è la password che stai cercando: \n")
-    password_search = input("Che password stai cercando: \n")
+    sito_search = id_sito_input_search()  # Uso una funzione per fare il check sul master
+    description_search = input("Che descrizione ha la password che stai cercando: \n")
     user_search = input("Chi è l'utente al quale appartiene la password: \n")
-    passwords = search_passwords(sito_search, password_search, user_search)
+    passwords = search_passwords(sito_search, description_search, user_search)
     if not passwords:
         print("Nessuna password trovata.")
         return
     else:
         print("Ecco le password trovate:\n")
         for pwd in passwords:
-            print(f"Sito: {pwd[0]} | Password: {pwd[1]} | User: {pwd[2]} | Descrizione: {pwd[3]}")
-        return passwords,sito_search,password_search,user_search   #sto ritornando una tupla!!
+            decrypted_password = decrypt_password(master, pwd[1])
+            print(f"Sito: {pwd[0]} | Password: {decrypted_password} | User: {pwd[2]} | Descrizione: {pwd[3]}")
+        return passwords,sito_search,description_search,user_search   #sto ritornando una tupla!!
 
-def delete_update_password_main():
+def delete_update_password_main(master):
     while True:
         print("Effettua la ricerca della password e successivamente eliminala/aggiornala!\n")
-        result = search_passwords_main()
+        result = search_passwords_main(master)
         if len(result[0]) != 1 :
             print("Puoi eliminare/aggiornare una sola password alla volta!")
         else:
@@ -55,11 +60,12 @@ def delete_update_password_main():
                 break
             elif confirm == 'update':
                 print("inserisci in sequenza i nuovi campi:")
-                Sito = input("Sito: ")
+                Sito = id_sito_input() 
                 Password = input("Password: ")
                 Username = input("Username: ")
                 Descrizione = input("Descrizione: ")
-                update_password(Sito,Password,Username,Descrizione,result[1],result[2],result[3])
+                encrypted_password = encrypt_password(master, Password) 
+                update_password(Sito,encrypted_password,Username,Descrizione,result[1],result[2],result[3])
                 print("La password è stata aggiornata con successo!")
                 break
             else:
@@ -72,8 +78,17 @@ def delete_update_password_main():
 
 
 def main():
-    print("Benvenuto nel Password Manager!")
-    initialize_db()
+    print("Benvenuto nel Password Manager!\n")
+    print("Scegli una master password per cifrare le tue password.\n" \
+    "Se hai già una master password, inseriscila per usare il password manager.\n")
+    # Qui potresti implementare un controllo per verificare se la master password è corretta
+    while True:
+        master = input("Inserisci la tua master password: ")
+        initialize_db(master)
+        if check_master_password(master) == True :
+            break
+        else:
+            print("La master password è errata!")  # Verifica la master password
 
     actions = {                               #è un type dictionary (ad ogni parola corrisponde una chiave)
         "1": add_new_password,
@@ -88,11 +103,11 @@ def main():
         choice = input("Scegli un'opzione: ")
         action = actions.get(choice)                   #salva in "action" l'azione desiderata
         if action:                                #in python valori vuoti o 0 sono considerati falsi
-            action()
+            action(master)
         else:
             print("Scelta non valida, riprova.")
 
-def exit_program():
+def exit_program(master):
     print("Uscita...")
     exit(0)                                    #termina il programma correttamente (0) altrimenti per errori si usa exit(1)
 
